@@ -117,7 +117,7 @@ NSOperationQueue *taskQueue;
         [cookieStr appendString:cookie.name];
         [cookieStr appendString:@"="];
         [cookieStr appendString:cookie.value];
-        
+
         if(cookie.expiresDate == nil) {
             [cookieStr appendString:@"; max-age=0"];
         }
@@ -128,18 +128,18 @@ NSOperationQueue *taskQueue;
             NSString *strDate = [dateFormatter stringFromDate:cookie.expiresDate];
             [cookieStr appendString:strDate];
         }
-        
-        
+
+
         [cookieStr appendString:@"; domain="];
         [cookieStr appendString:hostname];
         [cookieStr appendString:@"; path="];
         [cookieStr appendString:cookie.path];
-        
-        
+
+
         if (cookie.isSecure) {
             [cookieStr appendString:@"; secure"];
         }
-        
+
         if (cookie.isHTTPOnly) {
             [cookieStr appendString:@"; httponly"];
         }
@@ -229,6 +229,14 @@ NSOperationQueue *taskQueue;
         defaultConfigObject.timeoutIntervalForRequest = timeout/1000;
     }
     defaultConfigObject.HTTPMaximumConnectionsPerHost = 10;
+
+	NSString * sharedContainerIdentifier = [self.options valueForKey:@"sharedContainerIdentifier"];
+
+	if(sharedContainerIdentifier != nil)
+	{
+		defaultConfigObject.sharedContainerIdentifier = sharedContainerIdentifier;
+	}
+
     session = [NSURLSession sessionWithConfiguration:defaultConfigObject delegate:self delegateQueue:taskQueue];
     if(path != nil || [self.options valueForKey:CONFIG_USE_TEMP]!= nil)
     {
@@ -291,7 +299,7 @@ NSOperationQueue *taskQueue;
         [bridge.eventDispatcher sendDeviceEventWithName:EVENT_EXPIRE body:args];
 
     }
-    
+
     // clear expired task entries
     [expirationTable removeAllObjects];
     expirationTable = [[NSMapTable alloc] init];
@@ -397,7 +405,7 @@ NSOperationQueue *taskQueue;
                 [cookiesTable setObject:cookies forKey:response.URL.host];
             }
         }
-        
+
         [self.bridge.eventDispatcher
          sendDeviceEventWithName: EVENT_STATE_CHANGE
          body:respInfo
@@ -420,7 +428,7 @@ NSOperationQueue *taskQueue;
             }
             BOOL overwrite = [options valueForKey:@"overwrite"] == nil ? YES : [[options valueForKey:@"overwrite"] boolValue];
             BOOL appendToExistingFile = [destPath RNFBContainsString:@"?append=true"];
-            
+
             appendToExistingFile = !overwrite;
 
             // For solving #141 append response data if the file already exists
@@ -534,7 +542,7 @@ NSOperationQueue *taskQueue;
         // if it turns out not to be `nil` that means the response data contains valid UTF8 string,
         // in order to properly encode the UTF8 string, use URL encoding before BASE64 encoding.
         NSString * utf8 = [[NSString alloc] initWithData:respData encoding:NSUTF8StringEncoding];
-        
+
         if(responseFormat == BASE64)
         {
             rnfbRespType = RESP_TYPE_BASE64;
